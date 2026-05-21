@@ -29,6 +29,7 @@ SQLite
 Jinja
 HTML
 CSS
+Bootstrap
 Vanilla JavaScript
 Pytest
 ```
@@ -68,7 +69,7 @@ The database schema uses six tables: `users`, `projects`, `tasks`, `labels`, `ta
 
 Project progress is not stored as a separate database value. It is calculated from task status whenever the project is displayed. This avoids inconsistent data: if a task is marked done, the project percentage changes automatically.
 
-The frontend avoids a heavy framework so the project remains understandable and easy to present. Jinja templates render the pages, CSS handles the layout and responsive UI, and a small JavaScript file handles delete confirmations and quick status changes.
+The frontend avoids a heavy JavaScript framework so the project remains understandable and easy to present. Jinja templates render the pages, custom CSS handles the main layout and responsive UI, and Bootstrap is used lightly for familiar interface polish such as alerts and standard component behavior. A small JavaScript file handles delete confirmations and quick status changes.
 
 The smart planner is intentionally rule-based rather than hidden behind a black-box model. Each unfinished task receives a score based on priority, deadline urgency, current status, and estimated effort. High, medium, and low priority tasks add 40, 25, and 10 points. Overdue tasks add 50 points, tasks due today add 40 points, tasks due in the next three days add 25 points, and tasks due this week add 15 points. Tasks already in progress add 15 points, while not-started tasks add 5 points. Very quick tasks add 10 points, while very large tasks subtract 5 points so they can be planned more carefully. The app also shows the reasons behind each score, which makes the recommendation system explainable and useful even when a user has not created enough historical data for machine learning.
 
