@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block title %}{% if task %}Edit Task{% else %}New Task{% endif %} | FocusBoard{% endblock %}
+
+{% block body %}
+<section class="form-shell">
+    <p class="eyebrow">{{ project["name"] }}</p>
+    <h1>{% if task %}Edit task{% else %}Create task{% endif %}</h1>
+
+    <form method="post" class="stacked-form">
+        <label for="title">Title</label>
+        <input id="title" name="title" value="{{ task['title'] if task else '' }}" required>
+
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" rows="4">{{ task["notes"] if task else "" }}</textarea>
+
+        <div class="form-grid three">
+            <div>
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    {% for value in statuses %}
+                        <option value="{{ value }}" {% if task and task['status'] == value %}selected{% endif %}>{{ value.replace("_", " ").title() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                    {% for value in priorities %}
+                        <option value="{{ value }}" {% if task and task['priority'] == value %}selected{% endif %}>{{ value.title() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="estimated_minutes">Estimate</label>
+                <input id="estimated_minutes" name="estimated_minutes" type="number" min="0" step="5" value="{{ task['estimated_minutes'] if task and task['estimated_minutes'] else '' }}" placeholder="Minutes">
+            </div>
+        </div>
+
+        <label for="due_date">Due date</label>
+        <input id="due_date" name="due_date" type="date" value="{{ task['due_date'] if task else '' }}">
+
+        {% if labels %}
+            <fieldset class="label-picker">
+                <legend>Labels</legend>
+                {% for label in labels %}
+                    <label>
+                        <input type="checkbox" name="labels" value="{{ label['id'] }}" {% if label['id'] in selected_labels %}checked{% endif %}>
+                        <span class="pill {{ label['color'] }}">{{ label["name"] }}</span>
+                    </label>
+                {% endfor %}
+            </fieldset>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit">{% if task %}Save Task{% else %}Create Task{% endif %}</button>
+            <a href="{{ url_for('projects.detail', project_id=project['id']) }}">Cancel</a>
+        </div>
+    </form>
+
+    {% if task %}
+        <form method="post" action="{{ url_for('tasks.delete', task_id=task['id']) }}" class="danger-strip" data-confirm="Delete this task?">
+            <button class="danger-button" type="submit">Delete Task</button>
+        </form>
+    {% endif %}
+</section>
+{% endblock %}

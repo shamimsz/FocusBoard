@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}FocusBoard{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+    </head>
+    <body>
+        {% if g.user %}
+            <aside class="sidebar">
+                <a class="brand" href="{{ url_for('dashboard.home') }}">
+                    <span class="brand-mark">F</span>
+                    <span>FocusBoard</span>
+                </a>
+                <nav class="main-nav" aria-label="Main navigation">
+                    <a href="{{ url_for('dashboard.home') }}">Dashboard</a>
+                    <a href="{{ url_for('dashboard.smart_plan') }}">Smart Plan</a>
+                    <a href="{{ url_for('projects.list_projects') }}">Projects</a>
+                    <a href="{{ url_for('dashboard.calendar') }}">Calendar</a>
+                    <a href="{{ url_for('dashboard.export_tasks') }}">Export CSV</a>
+                </nav>
+                <div class="sidebar-footer">
+                    <p>{{ g.user["username"] }}</p>
+                    <a href="{{ url_for('auth.logout') }}">Log out</a>
+                </div>
+            </aside>
+        {% endif %}
+
+        <main class="{% if g.user %}app-main{% else %}auth-main{% endif %}">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <section class="messages" aria-label="Notifications">
+                        {% for category, message in messages %}
+                            <p class="message {{ category }}">{{ message }}</p>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+            {% endwith %}
+            {% block body %}{% endblock %}
+        </main>
+    </body>
+</html>

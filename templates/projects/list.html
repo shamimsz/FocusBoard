@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}Projects | FocusBoard{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div>
+        <p class="eyebrow">Projects</p>
+        <h1>{% if show_archived %}Archived projects{% else %}Active projects{% endif %}</h1>
+    </div>
+    <div class="header-actions">
+        <a class="button secondary" href="{{ url_for('projects.list_projects', archived=0 if show_archived else 1) }}">
+            {% if show_archived %}Show Active{% else %}Show Archived{% endif %}
+        </a>
+        <a class="button" href="{{ url_for('projects.create_project') }}">New Project</a>
+    </div>
+</header>
+
+{% if projects %}
+    <section class="project-grid">
+        {% for project in projects %}
+            <article class="project-card color-{{ project['color'] }}">
+                <div class="project-card-top">
+                    <h3><a href="{{ url_for('projects.detail', project_id=project['id']) }}">{{ project["name"] }}</a></h3>
+                    {% if project["deadline"] %}
+                        <time class="{% if project['deadline'] < today and project['progress'] < 100 %}overdue{% endif %}">{{ project["deadline"] }}</time>
+                    {% endif %}
+                </div>
+                <p>{{ project["description"] or "No description yet." }}</p>
+                <div class="progress-line">
+                    <span style="width: {{ project['progress'] }}%"></span>
+                </div>
+                <p class="muted">{{ project["progress"] }}% complete</p>
+            </article>
+        {% endfor %}
+    </section>
+{% else %}
+    <section class="empty-state">
+        <h3>No projects found</h3>
+        <p>Use projects to group related tasks and track completion.</p>
+        <a class="button" href="{{ url_for('projects.create_project') }}">Create Project</a>
+    </section>
+{% endif %}
+{% endblock %}

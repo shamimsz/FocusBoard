@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}Register | FocusBoard{% endblock %}
+
+{% block body %}
+<section class="auth-card">
+    <p class="eyebrow">New account</p>
+    <h1>Create your workspace.</h1>
+    <p class="muted">Use a strong password. Email is optional for this local demo.</p>
+
+    <form method="post" class="stacked-form">
+        <label for="username">Username</label>
+        <input id="username" name="username" required autocomplete="username">
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email">
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" minlength="8" required autocomplete="new-password">
+
+        <label for="confirmation">Confirm password</label>
+        <input id="confirmation" name="confirmation" type="password" minlength="8" required autocomplete="new-password">
+
+        <button type="submit">Create Account</button>
+    </form>
+    <p class="form-note">Already registered? <a href="{{ url_for('auth.login') }}">Log in</a>.</p>
+</section>
+{% endblock %}

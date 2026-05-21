@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}Log In | FocusBoard{% endblock %}
+
+{% block body %}
+<section class="auth-card">
+    <p class="eyebrow">FocusBoard</p>
+    <h1>Plan work with less noise.</h1>
+    <p class="muted">Log in to manage your projects, deadlines, and progress.</p>
+
+    <form method="post" class="stacked-form">
+        <label for="username">Username</label>
+        <input id="username" name="username" required autocomplete="username">
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required autocomplete="current-password">
+
+        <button type="submit">Log In</button>
+    </form>
+    <p class="form-note">No account yet? <a href="{{ url_for('auth.register') }}">Create one</a>.</p>
+</section>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+
+{% block title %}Smart Plan | FocusBoard{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div>
+        <p class="eyebrow">Smart planner</p>
+        <h1>Your next best actions.</h1>
+        <p class="muted">Tasks are ranked by priority, deadline urgency, current status, and estimated effort.</p>
+    </div>
+    <a class="button" href="{{ url_for('projects.create_project') }}">New Project</a>
+</header>
+
+<section class="planner-grid">
+    <div>
+        <div class="section-heading">
+            <h2>Recommended tasks</h2>
+            <span class="muted">{{ recommendations|length }} ranked tasks</span>
+        </div>
+
+        {% if recommendations %}
+            <div class="recommendation-list">
+                {% for item in recommendations %}
+                    <article class="recommendation-card priority-{{ item.task['priority'] }}">
+                        <div class="recommendation-score">
+                            <strong>{{ item.score }}</strong>
+                            <span>score</span>
+                        </div>
+                        <div class="recommendation-body">
+                            <div class="task-card-top">
+                                <h3><a href="{{ url_for('tasks.edit', task_id=item.task['id']) }}">{{ item.task["title"] }}</a></h3>
+                                <span class="pill {{ item.task['priority'] }}">{{ item.task["priority"] }}</span>
+                            </div>
+                            <p><span class="dot color-{{ item.task['project_color'] }}"></span>{{ item.task["project_name"] }}</p>
+                            <div class="task-meta">
+                                {% if item.task["due_date"] %}
+                                    <time class="{% if item.task['due_date'] < today %}overdue{% endif %}">Due {{ item.task["due_date"] }}</time>
+                                {% else %}
+                                    <span>No due date</span>
+                                {% endif %}
+                                <span>{{ item.task["status"].replace("_", " ").title() }}</span>
+                                {% if item.task["estimated_minutes"] %}
+                                    <span>{{ item.task["estimated_minutes"] }} min</span>
+                                {% endif %}
+                            </div>
+                            <ul class="reason-list">
+                                {% for reason in item.reasons %}
+                                    <li>{{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <section class="empty-state">
+                <h3>No open tasks</h3>
+                <p>Create tasks with due dates, priority, and estimates to generate a plan.</p>
+                <a class="button" href="{{ url_for('projects.list_projects') }}">View Projects</a>
+            </section>
+        {% endif %}
+    </div>
+
+    <aside class="planner-side">
+        <section class="panel">
+            <h2>Workload this week</h2>
+            <p class="big-number">{{ workload["task_count"] or 0 }}</p>
+            <p class="muted">open tasks due in the next 7 days</p>
+            <p><strong>{{ ((workload["estimated_minutes"] or 0) / 60)|round(1) }}</strong> estimated hours</p>
+        </section>
+
+        <section class="panel">
+            <h2>Project risk</h2>
+            {% if project_risks %}
+                <ul class="mini-list">
+                    {% for project in project_risks %}
+                        <li>
+                            <div>
+                                <a href="{{ url_for('projects.detail', project_id=project['id']) }}">
+                                    <span class="dot color-{{ project['color'] }}"></span>{{ project["name"] }}
+                                </a>
+                                <p>{{ project["open_tasks"] or 0 }} open, {{ project["overdue_tasks"] or 0 }} overdue</p>
+                            </div>
+                            {% if project["deadline"] %}
+                                <time class="{% if project['deadline'] < today %}overdue{% endif %}">{{ project["deadline"] }}</time>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No active project risk yet.</p>
+            {% endif %}
+        </section>
+    </aside>
+</section>
+{% endblock %}

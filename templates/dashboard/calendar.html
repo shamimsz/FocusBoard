@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}Calendar | FocusBoard{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div>
+        <p class="eyebrow">Deadlines</p>
+        <h1>Calendar view</h1>
+    </div>
+    <a class="button" href="{{ url_for('projects.create_project') }}">New Project</a>
+</header>
+
+<section class="calendar-grid">
+    {% for title, tasks in buckets.items() %}
+        <article class="panel">
+            <h2>{{ title }}</h2>
+            {% if tasks %}
+                <ul class="mini-list">
+                    {% for task in tasks %}
+                        <li>
+                            <div>
+                                <a href="{{ url_for('tasks.edit', task_id=task['id']) }}">{{ task["title"] }}</a>
+                                <p><span class="dot color-{{ task['project_color'] }}"></span>{{ task["project_name"] }}</p>
+                            </div>
+                            {% if task["due_date"] %}
+                                <time class="{% if task['due_date'] < today %}overdue{% endif %}">{{ task["due_date"] }}</time>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="muted">No tasks in this group.</p>
+            {% endif %}
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}

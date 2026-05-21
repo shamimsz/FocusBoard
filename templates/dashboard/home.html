@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard | FocusBoard{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div>
+        <p class="eyebrow">Dashboard</p>
+        <h1>Good work becomes visible here.</h1>
+    </div>
+    <div class="header-actions">
+        <a class="button secondary" href="{{ url_for('dashboard.calendar') }}">Calendar</a>
+        <a class="button" href="{{ url_for('projects.create_project') }}">New Project</a>
+    </div>
+</header>
+
+<section class="metric-grid">
+    <article class="metric-card">
+        <span>{{ summary["total"] or 0 }}</span>
+        <p>Total tasks</p>
+    </article>
+    <article class="metric-card">
+        <span>{{ summary["done"] or 0 }}</span>
+        <p>Completed</p>
+    </article>
+    <article class="metric-card">
+        <span>{{ summary["active"] or 0 }}</span>
+        <p>In progress</p>
+    </article>
+    <article class="metric-card warning">
+        <span>{{ summary["overdue"] or 0 }}</span>
+        <p>Overdue</p>
+    </article>
+    <article class="metric-card">
+        <span>{{ summary["due_today"] or 0 }}</span>
+        <p>Due today</p>
+    </article>
+</section>
+
+<section class="dashboard-grid">
+    <div>
+        <div class="section-heading">
+            <h2>Active projects</h2>
+            <a href="{{ url_for('projects.list_projects') }}">View all</a>
+        </div>
+        {% if projects %}
+            <div class="project-grid">
+                {% for project in projects %}
+                    <article class="project-card color-{{ project['color'] }}">
+                        <div class="project-card-top">
+                            <h3><a href="{{ url_for('projects.detail', project_id=project['id']) }}">{{ project["name"] }}</a></h3>
+                            {% if project["deadline"] %}
+                                <time class="{% if project['deadline'] < today and project['progress'] < 100 %}overdue{% endif %}">{{ project["deadline"] }}</time>
+                            {% endif %}
+                        </div>
+                        <p>{{ project["description"] or "No description yet." }}</p>
+                        <div class="progress-line">
+                            <span style="width: {{ project['progress'] }}%"></span>
+                        </div>
+                        <p class="muted">{{ project["done_count"] or 0 }} / {{ project["task_count"] or 0 }} tasks complete</p>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <section class="empty-state">
+                <h3>No projects yet</h3>
+                <p>Create a project, then add tasks with priorities and deadlines.</p>
+                <a class="button" href="{{ url_for('projects.create_project') }}">Create Project</a>
+            </section>
+        {% endif %}
+    </div>
+
+    <aside class="panel">
+        <h2>Upcoming</h2>
+        {% if upcoming %}
+            <ul class="mini-list">
+                {% for task in upcoming %}
+                    <li>
+                        <div>
+                            <a href="{{ url_for('tasks.edit', task_id=task['id']) }}">{{ task["title"] }}</a>
+                            <p><span class="dot color-{{ task['project_color'] }}"></span>{{ task["project_name"] }}</p>
+                        </div>
+                        {% if task["due_date"] %}
+                            <time class="{% if task['due_date'] < today %}overdue{% endif %}">{{ task["due_date"] }}</time>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">Nothing urgent yet.</p>
+        {% endif %}
+    </aside>
+</section>
+
+<section class="dashboard-grid lower">
+    <section class="panel">
+        <h2>Completion history</h2>
+        {% if weekly %}
+            <div class="bar-chart" data-chart>
+                {% for item in weekly %}
+                    <div class="bar-item">
+                        <span class="bar" style="height: {{ 24 + (item['completed'] * 18) }}px"></span>
+                        <small>{{ item["day"][5:] }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">Complete tasks to build a weekly chart.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2>Activity</h2>
+        {% if activity %}
+            <ul class="activity-list">
+                {% for item in activity %}
+                    <li>
+                        <span>{{ item["action"] }}</span>
+                        <time>{{ item["created_at"][:16] }}</time>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">Activity will appear after you create projects and tasks.</p>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}
